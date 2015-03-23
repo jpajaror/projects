@@ -15,6 +15,9 @@ if [ ! -e $STOREDIPFILE ]; then
 	touch $STOREDIPFILE
 fi
 
+LOGLINE="[$(date +"%Y-%m-%d %H:%M:%S")] Starting Execution!"
+echo $LOGLINE >> $LOGFILE
+
 #UPDATE_FRECUENCY=$(cat /etc/noip)
 
 while [ $UPDATE_FRECUENCY -gt 0 ]; do
