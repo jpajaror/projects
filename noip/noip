@@ -40,5 +40,8 @@ source /etc/noip
 
 done
 
+LOGLINE="[$(date +"%Y-%m-%d %H:%M:%S")] Gracefully Stopped"
+echo $LOGLINE >> $LOGFILE
+
 exit 0
 
