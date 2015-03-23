@@ -1,0 +1,44 @@
+#!/bin/bash
+# No-IP uses emails as passwords, so make sure that you encode the @ as %40
+USERNAME=""
+PASSWORD=""
+HOST=".ddns.net"
+#LOGFILE=logdir/noip.log
+LOGFILE=lnoip.log
+#STOREDIPFILE=configdir/current_ip
+STOREDIPFILE=current_ip
+
+source /etc/noip
+
+USERAGENT="Simple Bash No-IP Updater/0.4 antoniocs@gmail.com"
+if [ ! -e $STOREDIPFILE ]; then 
+	touch $STOREDIPFILE
+fi
+
+#UPDATE_FRECUENCY=$(cat /etc/noip)
+
+while [ $UPDATE_FRECUENCY -gt 0 ]; do
+NEWIP=$(wget -O - http://icanhazip.com/ -o /dev/null)
+STOREDIP=$(cat $STOREDIPFILE)
+
+if [ "$NEWIP" != "$STOREDIP" ]; then
+	RESULT=$(wget -O "$LOGFILE" -q --user-agent="$USERAGENT" --no-check-certificate "https://$USERNAME:$PASSWORD@dynupdate.no-ip.com/nic/update?hostname=$HOST&myip=$NEWIP")
+
+	LOGLINE="[$(date +"%Y-%m-%d %H:%M:%S")] $RESULT"
+	echo $NEWIP > $STOREDIPFILE
+else
+	LOGLINE="[$(date +"%Y-%m-%d %H:%M:%S")] No IP change"
+fi
+
+echo $LOGLINE >> $LOGFILE
+
+sleep $UPDATE_FRECUENCY
+
+source /etc/noip
+
+#UPDATE_FRECUENCY=$(cat /etc/noip)
+
+done
+
+exit 0
+
