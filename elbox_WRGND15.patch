@@ -1,0 +1,50 @@
+diff -rup elbox_WRGND15_old/boards/wrgnd15/ubicom/Makefile elbox_WRGND15_new/boards/wrgnd15/ubicom/Makefile
+--- elbox_WRGND15_old/boards/wrgnd15/ubicom/Makefile	2015-03-26 16:11:50.948000000 -0400
++++ elbox_WRGND15_new/boards/wrgnd15/ubicom/Makefile	2015-03-26 15:55:08.280000000 -0400
+@@ -300,7 +300,7 @@ $(UPGRADE).ub: $(IMAGE_LIST) $(UPGRADE).
+ 	$(MKIMAGE) -A ubicom32 -O linux -T multi -C lzma -a $$START_ADDR -e $$ENTRY_POINT \
+ 		-n $(CONFIG_IDENTITY_STRING) -d $(IMAGE_LIST_MKIMAGE) $@;
+ 	@$(call MSG,Sector Size is $(flash_sector_size))
+-	$(Q)EXTRA=$$(($(flash_sector_size) - (`stat $@ -c %s` & $(flash_sector_mask)))); \
++	$(Q)EXTRA=$$(( $$flash_sector_size - $$((`stat -c %s $@` & $flash_sector_mask )) )); \
+ 	$(call MSG,Add $$EXTRA bytes to $@ to round up to $(flash_sector_size) byte boundary); \
+ 	dd oflag=append of=$@ if=/dev/zero conv=block,notrunc count=$$EXTRA bs=1 status=noxfer 2> /dev/null
+ 
+@@ -333,7 +333,7 @@ $(UPGRADE).ub: $(IMAGE_LIST) $(UPGRADE).
+ 	$(MKIMAGE) -A ubicom32 -O linux -T multi -C gzip -a $$START_ADDR -e $$ENTRY_POINT \
+ 		-n $(CONFIG_IDENTITY_STRING) -d $(IMAGE_LIST_MKIMAGE) $@;
+ 	@$(call MSG,Sector Size is $(flash_sector_size))
+-	$(Q)EXTRA=$$(($(flash_sector_size) - (`stat $@ -c %s` & $(flash_sector_mask)))); \
++	$(Q)EXTRA=$$(( $$flash_sector_size - $$((`stat -c %s $@` & $flash_sector_mask )) )); \
+ 	$(call MSG,Add $$EXTRA bytes to $@ to round up to $(flash_sector_size) byte boundary); \
+ 	dd oflag=append of=$@ if=/dev/zero conv=block,notrunc count=$$EXTRA bs=1 status=noxfer 2> /dev/null
+ 
+diff -rup elbox_WRGND15_old/configs/Makefile.in elbox_WRGND15_new/configs/Makefile.in
+--- elbox_WRGND15_old/configs/Makefile.in	2013-05-14 01:41:17.000000000 -0400
++++ elbox_WRGND15_new/configs/Makefile.in	2015-03-26 15:50:25.956000000 -0400
+@@ -1,2 +1,2 @@
+-PROGS_GPL_SUBDIRS=busybox nsbbox iptables-1.4.7 mathopd-1.6 udhcpcd pppd.alpha wireless_tools iproute2-2.6.33 libiconv-1.13.1 sqlite-3.7.4 libgsasl udev-100 itunes_server/ mDNSResponder-107.1/ pure-ftpd dnsmasq radvd-1.8 wide-dhcpv6-20080615 ecmh ndisc6-0.9.9 smartmontools-5.41 sdparm-1.03 sg3_utils hdparm-9.37 hd-idle inotify json-c-0.9
++PROGS_GPL_SUBDIRS=busybox nsbbox iptables-1.4.7 mathopd-1.6 udhcpcd pppd.alpha wireless_tools iproute2-2.6.33 libiconv-1.13.1 sqlite-3.7.4 libgsasl udev-100 mDNSResponder-107.1/ pure-ftpd dnsmasq radvd-1.8 wide-dhcpv6-20080615 ecmh ndisc6-0.9.9 smartmontools-5.41 sdparm-1.03 sg3_utils hdparm-9.37 hd-idle inotify json-c-0.9
+ PROGS_PRIV_SUBDIRS= xmldb3 cyassl rgbin ifresetcnt madwifi_LSDK-WLAN-9.x mrd updateleases portt netstar proxyd lld2d Netbios servd cgibin.aries alpha_gd logd ddnsd llmnresp nameresolv hostapd_wps usbmount alpha_stunnel proxyd netstar dlna sitesurvey
+diff -rup elbox_WRGND15_old/progs.gpl/iproute2-2.6.33/tc/emp_ematch.y elbox_WRGND15_new/progs.gpl/iproute2-2.6.33/tc/emp_ematch.y
+--- elbox_WRGND15_old/progs.gpl/iproute2-2.6.33/tc/emp_ematch.y	2013-05-13 23:47:45.000000000 -0400
++++ elbox_WRGND15_new/progs.gpl/iproute2-2.6.33/tc/emp_ematch.y	2015-03-26 15:50:04.032000000 -0400
+@@ -19,7 +19,7 @@
+ 
+ %{
+  extern int ematch_lex(void);
+- extern void yyerror(char *s);
++ extern void yyerror(const char *s);
+  extern struct ematch *ematch_root;
+  extern char *ematch_err;
+ %}
+@@ -94,7 +94,7 @@ invert:
+ 	;
+ %%
+ 
+- void yyerror(char *s)
++ void yyerror(const char *s)
+  {
+ 	 ematch_err = strdup(s);
+  }
+Only in elbox_WRGND15_old/progs.gpl: itunes_server
