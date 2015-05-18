@@ -1,0 +1,42 @@
+#!/bin/sh
+# No-IP uses emails as passwords, so make sure that you encode the @ as %40
+USERNAME=""
+PASSWORD=""
+HOST=".ddns.net"
+LOGFILE=lnoip.log
+STOREDIPFILE=current_ip
+KEEPRUNNINGF=rnoip_keep
+UPDATE_FRECUENCY=10
+
+
+USERAGENT="Simple Bash No-IP Updater/0.4 antoniocs@gmail.com"
+if [ ! -e $STOREDIPFILE ]; then
+        touch $STOREDIPFILE
+fi
+
+LOGLINE="[$(date +"%Y-%m-%d %H:%M:%S")] Starting Execution!"
+echo $LOGLINE >> $LOGFILE
+
+while [ $(cat $KEEPRUNNINGF) -gt 0 ]; do
+NEWIP=$(wget -O - http://icanhazip.com/ -q)
+STOREDIP=$(cat $STOREDIPFILE)
+
+if [ "$NEWIP" != "$STOREDIP" ]; then
+        RESULT=$(wget -O "$LOGFILE" -q -U "$USERAGENT" "http://$USERNAME:$PASSWORD@dynupdate.no-ip.com/nic/update?hostname=$HOST&myip=$NEWIP")
+
+        LOGLINE="[$(date +"%Y-%m-%d %H:%M:%S")] $RESULT"
+        echo $NEWIP > $STOREDIPFILE
+else
+        LOGLINE="[$(date +"%Y-%m-%d %H:%M:%S")] No IP change"
+fi
+
+echo $LOGLINE >> $LOGFILE
+
+sleep $UPDATE_FRECUENCY
+
+done
+
+LOGLINE="[$(date +"%Y-%m-%d %H:%M:%S")] Gracefully Stopped"
+echo $LOGLINE >> $LOGFILE
+
+exit 0
